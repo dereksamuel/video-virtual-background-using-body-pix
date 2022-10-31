@@ -22,6 +22,12 @@ code {
   transform: translate(-50%, -50%);
 }
 
+.canvas-container {
+  background-color: rgb(48, 48, 48);
+  width: fit-content;
+}
+
 canvas {
-  background-color: black;
+  /* background: url(./assets/hacker-bg.jpg); */
+  background-size: cover;
 }

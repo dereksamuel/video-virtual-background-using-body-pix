@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as tf from "@tensorflow/tfjs";
 import * as bodyPix from "@tensorflow-models/body-pix";
+import imageHacker from "../assets/hacker-bg.jpg";
 import Webcam from "react-webcam";
 import { useRef, useState } from 'react';
 
@@ -33,10 +34,13 @@ function Camera() {
       // set video props
       webcamRef.current.video.width = videoWidth;
       webcamRef.current.video.height = videoHeight;
-
+      
       // set canvas w and h
       canvasRef.current.width = videoWidth;
       canvasRef.current.height = videoHeight;
+
+      const context = canvasRef.current.getContext("2d");
+      context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
  
       while(!stopBucle) {
         // detect
@@ -59,39 +63,43 @@ function Camera() {
             flipHorizontal
           );
         } else {
-          // const maskBackground = true;
-          const backgroundColor = {r: 0, g: 255, b: 0, a: 255};
-          const backgroundDarkeningMask = bodyPix.toMask(person, true, backgroundColor);
-          const imageData = backgroundDarkeningMask.data;
-          const opacity = 1;
-
-          // console.log(imageData);
-          // for(let i = 0; i < imageData.length; i += 4) {
-          //   if (imageData[i] === 255) {
-
-          //   }
-          // }
-
-          bodyPix.drawMask(
-            canvasRef.current,
-            $video,
-            backgroundDarkeningMask,
-            opacity,
-            edgeBlurAmount,
-            flipHorizontal
-          );
+          drawMask($video, net, person, context);
         }
       }
     }
   };
 
+  async function drawMask($video, net, person, context) {
+    const edgeBlurAmount = 2;
+    const flipHorizontal = true;
+
+    const mask = bodyPix.toMask(person);
+    const opacity = 1;
+
+    // create tempCanvas
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = $video.videoWidth;
+    tempCanvas.height = $video.videoHeight;
+    const tempCtx = tempCanvas.getContext("2d");
+
+    tempCtx.putImageData(mask, 0, 0);
+    canvasRef.current.style = `background: url(${imageHacker})`;
+    context.drawImage($video, 0, 0, canvasRef.current.width, canvasRef.current.height);
+    context.save();
+    context.globalCompositeOperation = "destination-out";
+    context.drawImage(tempCanvas, 0, 0, canvasRef.current.width, canvasRef.current.height);
+    context.restore();
+  }
+
   return (
     <>
       <Webcam ref={webcamRef} className="webcam" />
-      <canvas ref={canvasRef} />
+      <div className="canvas-container">
+        <canvas ref={canvasRef} />
+      </div>
       <button onClick={() => goBodySegment("blur")}>blur</button>
       <button onClick={() => goBodySegment("image-bg")}>image-bg</button>
-      <button onClick={() => setStopBucle(true)}>stop</button>
+      {/* <button onClick={() => setStopBucle(true)}>stop</button> */}
     </>
   );
 }
