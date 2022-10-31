@@ -18,6 +18,10 @@ code {
   position: absolute;
   left: 50%;
   top: 50%;
-  opacity: 0;
+  visibility: hidden;
   transform: translate(-50%, -50%);
+}
+
+canvas {
+  background-color: black;
 }
