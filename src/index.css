@@ -27,6 +27,21 @@ code {
   width: fit-content;
 }
 
+.loading {
+  color: white;
+}
+
+.filters {
+  position: fixed;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 10px 5px 30px;
+}
+
 canvas {
   /* background: url(./assets/hacker-bg.jpg); */
   background-size: cover;
