@@ -48,7 +48,7 @@ function Camera() {
         // detect
         const person = await net.segmentPerson($video, {
           internalResolution: "full",
-          segmentationThreshold: 0.95,
+          segmentationThreshold: 0.8,
           nmsRadius: 1,
           flipHorizontal: false,
         });
