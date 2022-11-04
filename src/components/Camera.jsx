@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 function Camera() {
   const [stopBucle, setStopBucle] = useState(false);
   const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [net, setNet] = useState(null);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -47,7 +47,10 @@ function Camera() {
       while(!stopBucle) {
         // detect
         const person = await net.segmentPerson($video, {
-          internalResolution: "low",
+          internalResolution: "full",
+          segmentationThreshold: 0.95,
+          nmsRadius: 1,
+          flipHorizontal: false,
         });
         setLoading(false);
 
@@ -85,6 +88,7 @@ function Camera() {
     canvasRef.current.style = `background: url(${url || imageHacker})`;
     context.drawImage($video, 0, 0, canvasRef.current.width, canvasRef.current.height);
     context.save();
+    context.filter = 'blur(5px)';
     context.globalCompositeOperation = "destination-out";
     context.drawImage(tempCanvas, 0, 0, canvasRef.current.width, canvasRef.current.height);
     context.restore();
@@ -101,20 +105,27 @@ function Camera() {
   return (
     <>
       <Webcam ref={webcamRef} className="webcam" />
-      <div className="canvas-container">
-        {loading && <p className="loading">Loading</p>}
-        <canvas ref={canvasRef} />
-      </div>
-      <div className="filters">
-        <label>
-          <p>blur filter:</p>
-          <button onClick={() => segmentationStart("blur")}>blur</button>
-        </label>
-        <label>
-          <p>image filter:</p>
-          <input type="file" onChange={onChangeImage} />
-          <button onClick={() => segmentationStart("bg-image")} disabled={!url}>Apply filter</button>
-        </label>
+      <div className="controls">
+        <div className="canvas-container">
+          {loading && <p className="loading">Loading</p>}
+          <canvas ref={canvasRef} />
+        </div>
+        <div className="filters">
+          <label className="filter">
+            <div className="inline">
+              <p>blur filter:</p>
+            </div>
+            <button onClick={() => segmentationStart("blur")}>blur</button>
+          </label>
+          <hr />
+          <label className="filter">
+            <div className="inline">
+              <p>image filter:</p>
+            </div>
+            <input type="file" onChange={onChangeImage} />
+            <button onClick={() => segmentationStart("bg-image")} disabled={!url}>Apply filter</button>
+          </label>
+        </div>
       </div>
       {/* <button onClick={() => setStopBucle(true)}>stop</button> */}
     </>
