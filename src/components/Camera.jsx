@@ -48,8 +48,8 @@ function Camera() {
         // detect
         const person = await net.segmentPerson($video, {
           internalResolution: "full",
-          segmentationThreshold: 0.8,
-          nmsRadius: 1,
+          segmentationThreshold: 0.85,
+          nmsRadius: 20,
           flipHorizontal: false,
         });
         setLoading(false);
@@ -88,7 +88,7 @@ function Camera() {
     canvasRef.current.style = `background: url(${url || imageHacker})`;
     context.drawImage($video, 0, 0, canvasRef.current.width, canvasRef.current.height);
     context.save();
-    context.filter = 'blur(5px)';
+    context.filter = 'blur(2px)';
     context.globalCompositeOperation = "destination-out";
     context.drawImage(tempCanvas, 0, 0, canvasRef.current.width, canvasRef.current.height);
     context.restore();
